@@ -1,0 +1,4 @@
+name = Csas yandex turbo
+description = https://yandex.ru/support/webmaster/turbo/connection.html
+core = 7.x
+configure = admin/config/services/csas-ytu

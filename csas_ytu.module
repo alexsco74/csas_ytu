@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * csas_ytu hooks file
+ */
+
+DEFINE('CSAS_YTU_RSS_URI', 'yandex-turbo');
+
+/**
+ * Implements hook_menu().
+ */
+function csas_ytu_menu() {
+  $items = [];
+  $items['admin/config/services/csas-ytu'] = [
+    'title' => 'Yandex.Turbo RSS',
+    'description' => 'Config csas_ytu',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['csas_ytu_admin_config'],
+    'access arguments' => ['access administration pages'],
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'csas_ytu.admin.inc',
+  ];
+  module_load_include('lib.inc', 'csas_ytu');
+  $channel_params = csas_ytu_lib_get_channel_params();
+  if ($channel_params[1]) {
+    foreach (range(1, $channel_params[1]) as $page_num) {
+      $rss_uri = csas_ytu_lib_get_rss_uri($page_num);
+      $items[$rss_uri] = [
+        'title' => 'Yandex Turbo RSS feed (page ' . $page_num . ')',
+        'page callback' => 'csas_ytu_pages_rss',
+        'page arguments' => [$rss_uri],
+        'access arguments' => ['access content'],
+        'type' => MENU_CALLBACK,
+        'file' => 'csas_ytu.pages.inc',
+      ];
+    }
+  }
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function csas_ytu_theme($existing, $type, $theme, $path) {
+  return [
+    'csas_ytu_theme_rss' => [
+      'variables' => [
+        'feeds' => NULL,
+        'page_num' => NULL,
+        'start_index' => NULL,
+        'count_rec' => NULL,
+        'return_mode' => 'print',
+        'channel' => NULL,
+      ],
+      'file' => 'csas_ytu.theme.inc',
+    ],
+  ];
+}
