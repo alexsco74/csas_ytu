@@ -220,7 +220,6 @@ function csas_ytu_admin_config($form, &$form_state) {
 }
 
 function csas_ytu_admin_config_submit($form, &$form_state) {
-  csas_dvl_ob(225, $form_state['values']);
   drupal_flush_all_caches();
 }
 
