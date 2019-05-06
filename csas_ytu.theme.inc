@@ -11,7 +11,7 @@
  */
 function template_preprocess_csas_ytu_theme_rss(&$variables) {
   module_load_include('lib.inc', 'csas_ytu');
-  if ($query = csas_ytu_lib_get_query($variables['page_num'], $variables['start_index'], $variables['count_rec'])) {
+  if ($query = csas_ytu_lib_get_query(FALSE, $variables['page_num'], $variables['start_index'], $variables['count_rec'])) {
     $variables['feeds'] = $query->execute()
       ->fetchAllAssoc('nid', PDO::FETCH_ASSOC);
   }
@@ -39,9 +39,9 @@ function theme_csas_ytu_theme_rss($variables) {
       $item_turbo_content = '';
       //img
       if (!isset($bundle_image_keys[$node['type']])
-      && !empty(variable_get('csas_ytu_image_field_bundle_' . $node['type'], ''))
+        && !empty(variable_get('csas_ytu_image_field_bundle_' . $node['type'], ''))
       ) {
-        $bundle_image_keys[$node['type']] = 'csas_ytu_image_field_bundle_' . $node['type'] .  '_uri';
+        $bundle_image_keys[$node['type']] = 'csas_ytu_image_field_bundle_' . $node['type'] . '_uri';
       }
       if (!empty($bundle_image_keys[$node['type']])) {
         $img_key = 'csas_ytu_image_field_bundle_' . $node['type'] . '_uri';
