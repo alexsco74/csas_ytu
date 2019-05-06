@@ -34,7 +34,6 @@ function csas_ytu_admin_config($form, &$form_state) {
     '#title' => t('Yandex Turbo settings'),
     '#markup' => t('See more about <a href="!url">@title</a>.', $args) . ' ' . t('RSS feed:') . ' ' . l("{$rss_href}-1", "{$rss_href}-1"),
   ];
-
   //exclude front page variable_get('site_frontpage')
   $form['csas_ytu_exclude_front_page'] = [
     '#title' => t('Exclude front page'),
@@ -55,45 +54,33 @@ function csas_ytu_admin_config($form, &$form_state) {
   ];
 
   $form['image_fields'] = [
-   // '#title' => t("Image fields"),
     '#prefix' => '<div id="textfields">',
     '#suffix' => '</div>',
-   // '#type' => 'fieldset',
   ];
 
-  if(isset($form_state['values']['csas_ytu_node_types'])){
+  if (isset($form_state['values']['csas_ytu_node_types'])) {
     $node_types = array_filter($form_state['values']['csas_ytu_node_types']);
-  } else {
+  }
+  else {
     $node_types = variable_get('csas_ytu_node_types', []);
   }
-
   foreach ($node_types as $csas_ytu_node_type) {
-    $image_options = field_info_instances('node',$csas_ytu_node_type);
-    $key = 'csas_ytu_image_type_' . $csas_ytu_node_type;
-    $form['image_fields'][$key] = [
-      '#type' => 'select',
-      '#title' => $csas_ytu_node_type,
-      '#options' => [t('- Select -')] + ['fn2' => 'fn2'],
-      '#default_value' => variable_get($key, 0)
-    ];
-  }
-//  $image_fields_child = element_children($form['image_fields']);
-//
-//  if(count($image_fields_child)){
-//    $form['image_fields']['#access'] = TRUE;
-//  } else {
-//    $form['image_fields']['#access'] = FALSE;
-//  }
-
-  if ($image_fields = field_read_fields(['type' => 'image'])) {
+    $image_fields = field_read_fields([
+      'type' => 'image',
+      'entity_type' => 'node',
+      'bundle' => $csas_ytu_node_type,
+    ]);
     $options = array_keys($image_fields);
     $options = array_combine($options, $options);
-    $form['csas_ytu_image_field'] = [
-      '#title' => t('Image field'),
+    $key = 'csas_ytu_image_field_bundle_' . $csas_ytu_node_type;
+    if (empty($options)) {
+      continue;
+    }
+    $form['image_fields'][$key] = [
       '#type' => 'select',
-      '#description' => t('Select image field for Yandex Turbo RSS export'),
+      '#title' => t('Image field for bundle "!bundle"', ['!bundle' => $csas_ytu_node_type]),
       '#options' => [t('- Select -')] + $options,
-      '#default_value' => variable_get('csas_ytu_image_field', 0),
+      '#default_value' => variable_get($key, 0),
     ];
   }
   if ($image_styles = image_styles()) {
@@ -223,15 +210,6 @@ function csas_ytu_admin_config_submit($form, &$form_state) {
   drupal_flush_all_caches();
 }
 
-/**
- * Callback for autotextfields.
- *
- * Selects the piece of the form we want to use as replacement text and returns
- * it as a form (renderable array).
- *
- * @return array
- *   Renderable array (the textfields element)
- */
 function ajax_example_autotextfields_callback($form, $form_state) {
   return $form['image_fields'];
 }

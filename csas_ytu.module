@@ -3,7 +3,6 @@
 /**
  * csas_ytu hooks file
  */
-
 DEFINE('CSAS_YTU_RSS_URI', 'yandex-turbo');
 
 /**

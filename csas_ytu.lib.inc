@@ -47,15 +47,23 @@ function csas_ytu_lib_get_query($page_num = 0, $start_index = 0, $count_rec = 50
   $order = variable_get('csas_ytu_order', 'DESC');
   $source = variable_get('csas_ytu_body', 'value');
   $query = db_select('node', 'n')
-    ->fields('n', ['nid', 'title', 'created'])
+    ->fields('n', ['nid', 'type', 'title', 'created'])
     ->condition('n.status', NODE_PUBLISHED)
     ->condition('n.type', $node_types, 'IN');
   $query->leftJoin('field_data_body', 'd', 'd.entity_id = n.nid AND d.entity_type = :node', [
     ':node' => 'node',
   ]);
   $query->addField('d', 'body_' . $source, 'body');
-  $img_field = variable_get('csas_ytu_image_field', '');
-  if (!empty($img_field)) {
+  //join image field
+  $image_fields = db_select('variable', 'v')
+    ->fields('v')->condition('v.name', 'csas_ytu_image_field_bundle_%', 'LIKE')->execute()->fetchAllAssoc('name');
+  foreach($image_fields as $image_field_name => $image_field_obj){
+    $value = unserialize($image_field_obj->value);
+
+    if(empty($value)){
+      continue;
+    }
+    $img_field = $value;
     $img_table = 'field_data_' . $img_field;
     $img_field_value_name = $img_field . '_fid';
     if (db_table_exists($img_table)) {
@@ -63,9 +71,9 @@ function csas_ytu_lib_get_query($page_num = 0, $start_index = 0, $count_rec = 50
         "{$img_table}.entity_type = :et AND {$img_table}.entity_id = n.nid AND {$img_table}.delta = 0",
         [':et' => 'node']
       );
-      $query->addField($img_table, $img_field_value_name, 'img_fid');
-      $query->leftJoin('file_managed', 'fm', "fm.fid = {$img_table}.{$img_field_value_name}");
-      $query->addField('fm', 'uri', 'img_uri');
+      $query->addField($img_table, $img_field_value_name, $image_field_name . '_fid');
+      $query->leftJoin('file_managed', $image_field_name, "{$image_field_name}.fid = {$img_table}.{$img_field_value_name}");
+      $query->addField($image_field_name, 'uri', $image_field_name . '_uri');
     }
   }
   if ('Yes' == variable_get('csas_ytu_sticky', 'No')) {

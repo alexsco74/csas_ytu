@@ -31,14 +31,25 @@ function theme_csas_ytu_theme_rss($variables) {
   $channel_analytics = variable_get('csas_ytu_rss_analytics_type', 'Yandex');
   $channel_analytics_id = variable_get('csas_ytu_rss_analytics_id', '');
   $style_name = variable_get('csas_ytu_image_style', 0);
+  $bundle_image_keys = [];
   if (!empty($feeds)) {
     $used = 0;
+
     foreach ($feeds as $nid => &$node) {
       $item_turbo_content = '';
       //img
-      //@todo
-      if (!empty($node['img_uri']) && !empty($style_name)) {
-        $node['img_uri'] = image_style_url($style_name, $node['img_uri']);
+      if (!isset($bundle_image_keys[$node['type']])
+      && !empty(variable_get('csas_ytu_image_field_bundle_' . $node['type'], ''))
+      ) {
+        $bundle_image_keys[$node['type']] = 'csas_ytu_image_field_bundle_' . $node['type'] .  '_uri';
+      }
+      if (!empty($bundle_image_keys[$node['type']])) {
+        $img_key = 'csas_ytu_image_field_bundle_' . $node['type'] . '_uri';
+      }
+      if (!empty($img_key)
+        && !empty($node[$img_key])
+        && !empty($style_name)) {
+        $node['img_uri'] = image_style_url($style_name, $node[$img_key]);
       }
       if (!empty($node['img_uri'])) {
         $item_turbo_content .= '<img src="' . $node['img_uri'] . '"/>';

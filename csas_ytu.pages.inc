@@ -3,7 +3,6 @@
 /**
  * csas_ytu pages
  */
-
 function csas_ytu_pages_rss($rss_uri) {
   $page_num = str_replace([CSAS_YTU_RSS_URI, '-'], '', $rss_uri);
   $vars = [
