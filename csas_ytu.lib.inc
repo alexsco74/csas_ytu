@@ -68,9 +68,13 @@ function csas_ytu_lib_get_query($get_count = FALSE, $page_num = 0, $start_index 
       ->condition('v.name', 'csas_ytu_image_field_bundle_%', 'LIKE')
       ->execute()
       ->fetchAllAssoc('name');
+
     foreach ($image_fields as $image_field_name => $image_field_obj) {
       $value = unserialize($image_field_obj->value);
-
+      $bundle = str_replace('csas_ytu_image_field_bundle_', '', $image_field_name);
+      if(!in_array($bundle, $node_types, TRUE)){
+        continue;
+      }
       if (empty($value)) {
         continue;
       }
