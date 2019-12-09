@@ -7,6 +7,14 @@
  */
 function csas_ytu_admin_config($form, &$form_state) {
   $form = [];
+  $form['csas_ytu_count_item_channel'] = [
+    '#title' => t('Count item channel'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#element_validate' => ['element_validate_integer_positive'],
+    '#size' => 5,
+    '#default_value' => variable_get('csas_ytu_count_item_channel', 1000),
+  ];
   $args = [
     '!url' => 'https://yandex.ru/support/webmaster/turbo/connection.html',
     '@title' => 'Yandex.Turbo RSS',
@@ -178,7 +186,7 @@ function csas_ytu_admin_config($form, &$form_state) {
     'code',
   ];
   $form['csas_ytu_rss_enable_tag'] = [
-    '#title' => t('RSS description'),
+    '#title' => t('Enable tags'),
     '#type' => 'textarea',
     '#required' => TRUE,
     '#default_value' => variable_get('csas_ytu_rss_enable_tag', implode("\n", $enable_tag)),
