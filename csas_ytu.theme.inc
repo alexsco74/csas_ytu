@@ -56,7 +56,11 @@ function theme_csas_ytu_theme_rss($variables) {
       }
       //body
       $allow_tags = variable_get('csas_ytu_rss_enable_tag', '');
-      $allow_tags = explode("\n", $allow_tags);
+      $allow_tags = array_filter(explode("\n", $allow_tags));
+
+      foreach ($allow_tags as &$allow_tag) {
+        $allow_tag = trim(str_replace(["\r"], '', $allow_tag));
+      }
       $node['body'] = preg_replace($cdata_pattern, '$1', $node['body']);
       $node['body'] = filter_xss($node['body'], $allow_tags);
       if (drupal_strlen($node['body']) > 350) {
